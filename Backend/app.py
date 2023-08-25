@@ -84,7 +84,19 @@ def add_link():
 
     new_data['_id'] = str(new_data['_id'])
     links_collection.insert_one(data)
-    return jsonify({"message": "Link added successfully", 'new_data': new_data})
+    return jsonify({"message": "Link added successfully", 'new_data': new_data}), 200
+
+
+@app.route('/get_nodes', methods=['GET'])
+def get_nodes():
+    nodes = list(nodes_collection.find({}, {'_id': 0}))
+    return jsonify({"nodes": nodes}), 200
+
+
+@app.route('/get_links', methods=['GET'])
+def get_links():
+    links = list(links_collection.find({}, {'_id': 0}))
+    return jsonify({"links": links}), 200
 
 
 if __name__ == '__main__':
