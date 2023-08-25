@@ -69,12 +69,22 @@ def add_node():
     return jsonify({"message": "Node added successfully", "new_data": new_data}), 200
 
 
-
 @app.route('/add_link', methods=['POST'])
 def add_link():
     data = request.json
+    target = data['target']
+    source = data['source']
+    strength = data['strength']
+
+    new_data = {
+        "target": target,
+        "source": source,
+        "strength": strength
+    }
+
+    new_data['_id'] = str(new_data['_id'])
     links_collection.insert_one(data)
-    return jsonify({"message": "Link added successfully", 'data': data})
+    return jsonify({"message": "Link added successfully", 'new_data': new_data})
 
 
 if __name__ == '__main__':
