@@ -1,4 +1,5 @@
 <script>
+	import axios from 'axios';
 	import { select } from 'd3-selection';
 	import {
 		forceSimulation,
@@ -9,35 +10,21 @@
 	import { onMount } from 'svelte';
 	import { drag } from 'd3-drag';
 	let nodes = [
-		{ id: 'mammal', group: 0, label: 'Mammals', level: 1 },
-		{ id: 'dog', group: 0, label: 'Dogs', level: 2 },
-		{ id: 'cat', group: 0, label: 'Cats', level: 2 },
-		{ id: 'fox', group: 0, label: 'Foxes', level: 2 },
-		{ id: 'elk', group: 0, label: 'Elk', level: 2 },
-		{ id: 'insect', group: 1, label: 'Insects', level: 1 },
-		{ id: 'ant', group: 1, label: 'Ants', level: 2 },
-		{ id: 'bee', group: 1, label: 'Bees', level: 2 },
-		{ id: 'fish', group: 2, label: 'Fish', level: 1 },
-		{ id: 'carp', group: 2, label: 'Carp', level: 2 },
-		{ id: 'pike', group: 2, label: 'Pikes', level: 2 },
+		// {
+		// 	group: 0,
+		// 	id: 'mammal',
+		// 	label: 'Mammals',
+		// 	level: 1,
+		// },
+		// {
+		// 	group: 0,
+		// 	id: 'mammal',
+		// 	label: 'Mammals',
+		// 	level: 1,
+		// },
 	];
 
-	let links = [
-		{ target: 'mammal', source: 'dog', strength: 0.7 },
-		{ target: 'mammal', source: 'cat', strength: 0.7 },
-		{ target: 'mammal', source: 'fox', strength: 0.7 },
-		{ target: 'mammal', source: 'elk', strength: 0.7 },
-		{ target: 'insect', source: 'ant', strength: 0.7 },
-		{ target: 'insect', source: 'bee', strength: 0.7 },
-		{ target: 'fish', source: 'carp', strength: 0.7 },
-		{ target: 'fish', source: 'pike', strength: 0.7 },
-		{ target: 'cat', source: 'elk', strength: 0.1 },
-		{ target: 'carp', source: 'ant', strength: 0.1 },
-		{ target: 'elk', source: 'bee', strength: 0.1 },
-		{ target: 'dog', source: 'cat', strength: 0.1 },
-		{ target: 'fox', source: 'ant', strength: 0.1 },
-		{ target: 'pike', source: 'dog', strength: 0.1 },
-	];
+	let links = [];
 
 	let selectedNode = null;
 
@@ -45,20 +32,40 @@
 		selectedNode = node;
 	};
 
-	const width = window.innerWidth;
-	const height = window.innerHeight;
+	const dataNodes = async (nodes) => {
+		const res = await axios({
+			method: 'get',
+			credential: 'include',
+			url: 'http://127.0.0.1:4000/get_nodes',
+		});
+		console.log(res.data, 'result');
+		nodes = res.data;
+		console.log(nodes, 'nodes');
+	};
+
+	const width = 500;
+	const height = 500;
 
 	onMount(() => {
-		let svg = select('svg').attr('width', width).attr('height', height);
+		// dataNodes(nodes);
+		// console.timeLog(dataNodes(nodes))
+		
 
+		
+		let list = select('svg').attr('width', width).attr('height', height);
+		// console.log('list',list);
+
+		// console.log(nodes, 'nodes');
 		const simulation = forceSimulation(nodes)
 			.force('charge', forceManyBody().strength(-20))
 			.force('center', forceCenter(width / 2, height / 2));
 
+          // console.log(nodes, 'simulation');
+
 		function getNodeColor(node) {
 			return node.level === 1 ? 'red' : 'gray';
 		}
-		const nodeElements = svg
+		const nodeElements = list
 			.append('g')
 			.selectAll('circle')
 			.data(nodes)
@@ -66,7 +73,7 @@
 			.append('circle')
 			.attr('r', 10)
 			.attr('fill', getNodeColor);
-		const textElements = svg
+		const textElements = list
 			.append('g')
 			.selectAll('text')
 			.data(nodes)
@@ -89,7 +96,7 @@
 				.strength((link) => link.strength)
 		);
 
-		const linkElements = svg
+		const linkElements = list
 			.append('g')
 			.selectAll('line')
 			.data(links)
@@ -172,10 +179,12 @@
 		// }
 
 		// nodeElements.on('click', selectNode);
+
+		
 	});
 </script>
 
-<form class="row g-3">
+<!-- <form class="row g-3">
 	<div class="col-md-3">
 		<input
 			type="email"
@@ -198,20 +207,21 @@
 			class="btn btn-primary">Search</button
 		>
 	</div>
-</form>
+</form> -->
 
-<svg on:click={() => (selectedNode = null)} />
+<svg />
 
+<!-- 
 {#if selectedNode}
 	<div class="node-details">
 		<h3>{selectedNode.label}</h3>
-		<!-- Display other details of the selected node -->
-	</div>
-{/if}
+		 Display other details of the selected node -->
+<!-- </div> -->
+<!-- {/if}  -->
 
-<style>
+<!-- <style>
 	.node-details {
 		position: absolute;
 		background: white;
 	}
-</style>
+</style> -->
